@@ -6,7 +6,7 @@ import torch
 import torch.utils.data as data
 
 
-class TimeSeriesDataset(data.Dataset):
+class TimeSeriesDatasetForFNN(data.Dataset):
     def __init__(self, path, transform=None, Q_window=True, Q_lags=4,
                  n_window=False, n_lags=4, filled=False,
                  split='train', train_ratio=0.8):
@@ -156,3 +156,9 @@ class TimeSeriesDataset(data.Dataset):
         :return: Длина датасета
         """
         return len(self.X)
+
+
+if __name__ == '__main__':
+    d_test = TimeSeriesDatasetForFNN('datasets', Q_window=False, Q_lags=4, n_window=True, n_lags=4, filled=False,
+                                      split='test')
+    print(len(d_test))
