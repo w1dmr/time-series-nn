@@ -51,6 +51,22 @@ class TimeSeriesDatasetForFNN(data.Dataset):
         # Загрузка и обработка всех файлов
         self.X = self._load_and_process_files()
 
+        if self.split == 'train':
+            self.x_mean = self.X.mean(dim=0)[:-4]
+            self.x_std = self.X.std(dim=0)[:-4] + 1e-8
+        else:
+            self.x_mean = None
+            self.x_std = None
+
+    def set_normalization_params(self, x_mean, x_std):
+        self.x_mean = x_mean
+        self.x_std = x_std
+
+        self.X[:, :-4] = (self.X[:, :-4] - self.x_mean) / self.x_std
+
+    def denormalize(self):
+        self.X[:, :-4] = self.X[:, :-4] * self.x_std + self.x_mean
+
     def _load_and_process_files(self):
         """
         Загрузка и предварительная обработка данных из всех файлов в директории
@@ -159,6 +175,6 @@ class TimeSeriesDatasetForFNN(data.Dataset):
 
 
 if __name__ == '__main__':
-    d_test = TimeSeriesDatasetForFNN('datasets', Q_window=False, Q_lags=4, n_window=True, n_lags=4, filled=False,
-                                      split='test')
-    print(len(d_test))
+    d_test = TimeSeriesDatasetForFNN('datasets', Q_window=True, Q_lags=4, n_window=False, n_lags=4, filled=False,
+                                     split='test')
+    print(d_test)
